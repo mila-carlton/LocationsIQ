@@ -39,6 +39,10 @@ final class ListTableViewCell: UITableViewCell {
         titleLabel.text = listItem.name?.capitalized ?? ""
     }
     
+    func configure(searchItem: SearchModelElement) {
+        titleLabel.text = searchItem.displayName?.capitalized ?? ""
+    }
+    
     
     
     private func setupUI() {

@@ -25,4 +25,15 @@ final class WebService {
         }
     }
     
+    func fetchSearch(query: String, completion: @escaping (([SearchModelElement]?) -> Void)) {
+        let url = URL(string: "https://us1.locationiq.com/v1/search?key=\(apiKey)&q=\(query)&format=json")!
+        NetworkRequest.shared.requestAPI(type: SearchModel.self, url: url.absoluteString) { result in
+            switch result {
+            case .success(let search):
+                completion(search)
+            case .failure(_):
+                completion(nil)
+            }
+        }
+    }
 }

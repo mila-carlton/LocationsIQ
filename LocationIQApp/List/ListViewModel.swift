@@ -24,7 +24,8 @@ final class ListViewModel {
     var categoryList: CategoriesModel = []
     
     func fetchCategories(completion: @escaping (() -> Void)) {
-        webService.fetchCategories(categoryEnum: category) { category in
+        webService.fetchCategories(categoryEnum: category) { [weak self] category in
+            guard let self = self else { return }
             self.categoryList = category ?? []
             completion()
         }

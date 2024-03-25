@@ -49,9 +49,6 @@ final class ListViewController: UIViewController {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
         
-        
-       
-        
         viewModel.fetchCategories {
             DispatchQueue.main.async {
                 self.listTableView.reloadData()
@@ -59,18 +56,23 @@ final class ListViewController: UIViewController {
             }
         }
         
-        
-        
     }
     
     
     private func setPointAnnotations() {
+        
+        var zoomRect = MKMapRect.null
         
         for category in viewModel.categoryList {
             let annotations = MKPointAnnotation()
             annotations.title = category.name
             annotations.coordinate = CLLocationCoordinate2D(latitude: Double(category.lat ?? "")!,
                                                             longitude:  Double(category.lon ?? "")!)
+            let annotationPoint = MKMapPoint(annotations.coordinate)
+            let pointRect = MKMapRect(x: annotationPoint.x, y: annotationPoint.y, width: 0, height: 0)
+            zoomRect = zoomRect.union(pointRect)
+            let padding = UIEdgeInsets(top: 50, left: 50, bottom: 50, right: 50)
+            mapView.setVisibleMapRect(zoomRect, edgePadding: padding, animated: true)
             self.mapView.addAnnotation(annotations)
         }
     }
@@ -86,6 +88,7 @@ final class ListViewController: UIViewController {
         setupUI()
         listSegmentControl.selectedSegmentIndex = 0
         segmentControlAction()
+
         
     }
     
