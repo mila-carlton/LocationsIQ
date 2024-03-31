@@ -14,6 +14,8 @@
 		653D720A2BAF399B0056AC59 /* ListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D72092BAF399B0056AC59 /* ListTableViewCell.swift */; };
 		653D720C2BB172AC0056AC59 /* SearchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D720B2BB172AC0056AC59 /* SearchModel.swift */; };
 		653D720E2BB172CC0056AC59 /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D720D2BB172CC0056AC59 /* SearchViewModel.swift */; };
+		653D72122BB9FF830056AC59 /* DetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D72112BB9FF830056AC59 /* DetailsViewController.swift */; };
+		653D72142BB9FFA30056AC59 /* DetailsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 653D72132BB9FFA30056AC59 /* DetailsViewModel.swift */; };
 		655DB0DB2BAD93BF00F0701E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655DB0DA2BAD93BF00F0701E /* AppDelegate.swift */; };
 		655DB0DD2BAD93BF00F0701E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655DB0DC2BAD93BF00F0701E /* SceneDelegate.swift */; };
 		655DB0E42BAD93C300F0701E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 655DB0E32BAD93C300F0701E /* Assets.xcassets */; };
@@ -33,6 +35,8 @@
 		653D72092BAF399B0056AC59 /* ListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListTableViewCell.swift; sourceTree = "<group>"; };
 		653D720B2BB172AC0056AC59 /* SearchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchModel.swift; sourceTree = "<group>"; };
 		653D720D2BB172CC0056AC59 /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
+		653D72112BB9FF830056AC59 /* DetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsViewController.swift; sourceTree = "<group>"; };
+		653D72132BB9FFA30056AC59 /* DetailsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsViewModel.swift; sourceTree = "<group>"; };
 		655DB0D72BAD93BF00F0701E /* LocationIQApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LocationIQApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		655DB0DA2BAD93BF00F0701E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		655DB0DC2BAD93BF00F0701E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -78,6 +82,15 @@
 			path = List;
 			sourceTree = "<group>";
 		};
+		653D72102BB9FF4A0056AC59 /* DetailsView */ = {
+			isa = PBXGroup;
+			children = (
+				653D72112BB9FF830056AC59 /* DetailsViewController.swift */,
+				653D72132BB9FFA30056AC59 /* DetailsViewModel.swift */,
+			);
+			path = DetailsView;
+			sourceTree = "<group>";
+		};
 		655DB0CE2BAD93BF00F0701E = {
 			isa = PBXGroup;
 			children = (
@@ -102,6 +115,7 @@
 				655DB0F62BAD998A00F0701E /* CategoriesView */,
 				653D72012BAF33030056AC59 /* List */,
 				653D71FE2BADD31F0056AC59 /* SearchView */,
+				653D72102BB9FF4A0056AC59 /* DetailsView */,
 				655DB0E32BAD93C300F0701E /* Assets.xcassets */,
 				655DB0E52BAD93C300F0701E /* LaunchScreen.storyboard */,
 				655DB0E82BAD93C300F0701E /* Info.plist */,
@@ -210,6 +224,7 @@
 				653D720C2BB172AC0056AC59 /* SearchModel.swift in Sources */,
 				653D72062BAF33CD0056AC59 /* ListViewModel.swift in Sources */,
 				655DB0F22BAD969D00F0701E /* NetworkManager.swift in Sources */,
+				653D72142BB9FFA30056AC59 /* DetailsViewModel.swift in Sources */,
 				655DB0DB2BAD93BF00F0701E /* AppDelegate.swift in Sources */,
 				653D72002BADD3430056AC59 /* SearchViewController.swift in Sources */,
 				653D72032BAF33300056AC59 /* CategoryResponseModel.swift in Sources */,
@@ -221,6 +236,7 @@
 				655DB0F82BAD99AA00F0701E /* CategoriesModel.swift in Sources */,
 				655DB0F42BAD972700F0701E /* WebService.swift in Sources */,
 				655DB0DD2BAD93BF00F0701E /* SceneDelegate.swift in Sources */,
+				653D72122BB9FF830056AC59 /* DetailsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
