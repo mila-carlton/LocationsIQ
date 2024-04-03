@@ -85,5 +85,12 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let selectedCategory = viewModel.searchResults[indexPath.row]
+        let detailsViewModel = DetailsViewModel(location: selectedCategory)
+        let detailsViewController = DetailsViewController(viewModel: detailsViewModel)
+        navigationController?.pushViewController(detailsViewController, animated: true)
+    }
+    
     
 }

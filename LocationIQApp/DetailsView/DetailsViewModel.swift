@@ -10,30 +10,25 @@ import MapKit
 
 final class DetailsViewModel {
     
-    var location: SearchModelElement?
-    var lat = ""
-    var lon = ""
+    private var location: SearchModelElement?
     
-    init() {}
+    var item: SearchModelElement? {
+        return location
+    }
     
     init(location: SearchModelElement) {
         self.location = location
-        configure()
     }
     
-    func configure() {
-        lat = location?.lat ?? ""
-        lon = location?.lon ?? ""
-    }
-    
-    func setAnnotations() -> [MKPointAnnotation] {
-        var annotations: [MKPointAnnotation] = []
+    func makeAnnotations() -> [MKPointAnnotation] {
+        guard let location = location else { return [] }
+        
         let annotation = MKPointAnnotation()
-        let lat = Double(location?.lat ?? "") ?? 0.0
-        let lon = Double(location?.lon ?? "") ?? 0.0
-        annotation.title = location?.displayName ?? ""
-        annotation.coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
-        annotations.append(annotation)
-        return annotations
+        if let lat = Double(location.lat ?? ""), let lon = Double(location.lon ?? "") {
+            annotation.coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        }
+        annotation.title = location.displayName
+        
+        return [annotation]
     }
 }
