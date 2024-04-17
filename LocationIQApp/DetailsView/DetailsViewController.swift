@@ -14,6 +14,7 @@ final class DetailsViewController: UIViewController, MKMapViewDelegate {
     private lazy var mapView: MKMapView = {
         let map = MKMapView()
         map.translatesAutoresizingMaskIntoConstraints = false
+        map.delegate = self
         view.addSubview(map)
         return map
     }()
@@ -54,6 +55,8 @@ final class DetailsViewController: UIViewController, MKMapViewDelegate {
     
     let locationManager = CLLocationManager()
     
+    var userLocation: CLLocation?
+    
     init(viewModel: DetailsViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -67,11 +70,13 @@ final class DetailsViewController: UIViewController, MKMapViewDelegate {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupLayout()
+        configureLocationManager()
         setupActions()
+        updateMap()
+        
     }
     
     private func setupLayout() {
-        mapView.delegate = self
         
         NSLayoutConstraint.activate([
             mapView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 4),
@@ -88,7 +93,7 @@ final class DetailsViewController: UIViewController, MKMapViewDelegate {
             addressLabel.leadingAnchor.constraint(equalTo: addressStaticLabel.trailingAnchor, constant: 2),
             addressLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -4),
             addressLabel.centerYAnchor.constraint(equalTo: addressStaticLabel.centerYAnchor),
-            addressLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 28),
+            addressLabel.heightAnchor.constraint(equalToConstant: 150),
             
             routeButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -36),
             routeButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -101,13 +106,49 @@ final class DetailsViewController: UIViewController, MKMapViewDelegate {
     func configureLocationManager() {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestAlwaysAuthorization()
         locationManager.startUpdatingLocation()
     }
     
     func updateMap() {
-        mapView.addAnnotations(viewModel.makeAnnotations())
         addressLabel.text = "Address: \(viewModel.item?.displayName ?? "")"
+        setPointAnnotations()
+        
+        guard let latitudeString = viewModel.item?.lat,
+              let longitudeString = viewModel.item?.lon,
+              let latitude = Double(latitudeString),
+              let longitude = Double(longitudeString) else {
+            return
+        }
+        
+        let coordinates = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        let region = MKCoordinateRegion(center: coordinates, latitudinalMeters: 1000, longitudinalMeters: 1000)
+        mapView.setRegion(region, animated: true)
+    }
+    
+    
+    private func setPointAnnotations() {
+        
+        var zoomRect = MKMapRect.null
+        
+        let annotations = MKPointAnnotation()
+        annotations.title = viewModel.item?.displayName ?? ""
+        annotations.coordinate = CLLocationCoordinate2D(latitude: Double(viewModel.item?.lat ?? "")!,
+                                                        longitude:  Double(viewModel.item?.lon ?? "")!)
+        let annotationPoint = MKMapPoint(annotations.coordinate)
+        let pointRect = MKMapRect(x: annotationPoint.x, y: annotationPoint.y, width: 0, height: 0)
+        zoomRect = zoomRect.union(pointRect)
+        let padding = UIEdgeInsets(top: 50, left: 50, bottom: 50, right: 50)
+        mapView.setVisibleMapRect(zoomRect, edgePadding: padding, animated: true)
+        self.mapView.addAnnotation(annotations)
+        
+        
+        if let location =  viewModel.item {
+            let span = MKCoordinateSpan(latitudeDelta: 0.3, longitudeDelta: 0.3)
+            let region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: Double(location.lat ?? "0") ?? 0.0, longitude: Double(location.lon ?? "0") ?? 0.0), span: span)
+            self.mapView.setRegion(region, animated: true)
+        }
+        
     }
     
     private func setupActions() {
@@ -115,7 +156,7 @@ final class DetailsViewController: UIViewController, MKMapViewDelegate {
     }
     
     @objc func routeButtonTapped() {
-        let actionSheet = UIAlertController(title: "Alert Action", message: "Choose for Direction", preferredStyle: .actionSheet)
+        let actionSheet = UIAlertController(title: "Select route", message: "Choose for Direction", preferredStyle: .actionSheet)
         
         actionSheet.addAction(UIAlertAction(title: "Here", style: .default) { _ in
             self.getAdressHere()
@@ -131,10 +172,17 @@ final class DetailsViewController: UIViewController, MKMapViewDelegate {
     }
     
     func getAdressHere() {
-        guard let sourceLat = Double(viewModel.item?.lat ?? ""), let sourceLon = Double(viewModel.item?.lon ?? "") else { return }
-        let sourceLocation = CLLocationCoordinate2D(latitude: sourceLat, longitude: sourceLon)
-        let destinationLocation = CLLocationCoordinate2D(latitude: Double(viewModel.item?.lat ?? "") ?? 0.0, longitude: Double(viewModel.item?.lon ?? "") ?? 0.0)
-        routeHere(sourceLocation: sourceLocation, destinationLocation: destinationLocation)
+
+        guard let latitudeString = viewModel.item?.lat,
+              let longitudeString = viewModel.item?.lon,
+              let latitude = Double(latitudeString),
+              let longitude = Double(longitudeString) else {
+            return
+        }
+        
+        let coordinates = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        let region = MKCoordinateRegion(center: coordinates, latitudinalMeters: 1000, longitudinalMeters: 1000)
+        mapView.setRegion(region, animated: true)
     }
     
     func getAdressOnMaps() {
@@ -164,29 +212,35 @@ final class DetailsViewController: UIViewController, MKMapViewDelegate {
         directionRequest.destination = destinationMapItem
         directionRequest.transportType = .automobile
         
-        let direction = MKDirections(request: directionRequest)
-        
-        direction.calculate { response, error in
-            guard let response = response else {
-                if let error = error {
-                    print("Error: \(error)")
-                }
+        let directions = MKDirections(request: directionRequest)
+        directions.calculate { (response, error) in
+            guard let unwrappedResponse = response, error == nil else {
+                print("Error getting directions: \(error?.localizedDescription ?? "Unknown error")")
                 return
             }
-            let route = response.routes[0]
-            self.mapView.addOverlay(route.polyline)
+            
+            let route = unwrappedResponse.routes[0]
+            self.mapView.addOverlay(route.polyline, level: .aboveRoads)
+            
             let rect = route.polyline.boundingMapRect
             self.mapView.setRegion(MKCoordinateRegion(rect), animated: true)
         }
     }
-}
 
-extension DetailsViewController: CLLocationManagerDelegate {
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.first {
-            let span = MKCoordinateSpan(latitudeDelta: 0.3, longitudeDelta: 0.3)
-            let region = MKCoordinateRegion(center: location.coordinate, span: span)
-            mapView.setRegion(region, animated: true)
-        }
     }
-}
+
+    
+    extension DetailsViewController: CLLocationManagerDelegate {
+        func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+            if let location = locations.last {
+                self.userLocation = location
+                let span = MKCoordinateSpan(latitudeDelta: 0.3, longitudeDelta: 0.3)
+                let region = MKCoordinateRegion(center: location.coordinate, span: span)
+                mapView.setRegion(region, animated: true)
+            }
+        }
+        
+        
+        
+    }
+

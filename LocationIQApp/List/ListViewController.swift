@@ -38,12 +38,21 @@ final class ListViewController: UIViewController {
     private lazy var mapView: MKMapView = {
         let map = MKMapView()
         map.translatesAutoresizingMaskIntoConstraints = false
+        map.showsUserLocation = true
+        map.delegate = self
         view.addSubview(map)
         return map
     }()
     
     
     private var viewModel: ListViewModel
+    
+    private var locationManager: CLLocationManager = {
+        let manager = CLLocationManager()
+        manager.desiredAccuracy = kCLLocationAccuracyBest
+        manager.requestAlwaysAuthorization()
+        return manager
+    }()
     
     init(viewModel: ListViewModel) {
         self.viewModel = viewModel
@@ -88,8 +97,9 @@ final class ListViewController: UIViewController {
         setupUI()
         listSegmentControl.selectedSegmentIndex = 0
         segmentControlAction()
+        locationManager.delegate = self
 
-        
+        locationManager.requestWhenInUseAuthorization()
     }
     
     @objc func segmentControlAction() {
@@ -144,5 +154,16 @@ extension ListViewController: UITableViewDelegate, UITableViewDataSource {
         cell.configure(listItem: viewModel.categoryList[indexPath.row])
         return cell
     }
+    
+}
+extension ListViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.last {
+            
+        }
+    }
+}
+
+extension ListViewController: MKMapViewDelegate {
     
 }

@@ -26,7 +26,8 @@ final class WebService {
     }
     
     func fetchSearch(query: String, completion: @escaping (([SearchModelElement]?) -> Void)) {
-        let url = URL(string: "https://us1.locationiq.com/v1/search?key=\(apiKey)&q=\(query)&format=json")!
+        let q = query.replacingOccurrences(of: " ", with: "_")
+        let url = URL(string: "https://us1.locationiq.com/v1/search?key=\(apiKey)&q=\(q)&format=json")!
         NetworkRequest.shared.requestAPI(type: SearchModel.self, url: url.absoluteString) { result in
             switch result {
             case .success(let search):
